@@ -22,7 +22,18 @@ void gruv_init() {
 
 }
 
-static bool gruv_version (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t rindex) {
+bool gruv_startLoop (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t rindex) {
+    #pragma unused (vm, nargs)
+
+    uv_run(gruv_loop, UV_RUN_DEFAULT);
+
+    uv_loop_close(gruv_loop);
+    free(gruv_loop);
+
+    RETURN_NOVALUE();
+}
+
+bool gruv_version (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t rindex) {
     #pragma unused (vm, nargs)
     const char * version = uv_version_string();
     RETURN_VALUE(
