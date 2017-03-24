@@ -1,0 +1,10 @@
+#unittest {
+	name: "test gruv";
+	error: NONE;
+	result: "1.11.1-dev";
+};
+
+
+func main() {
+	return Gruv.version();
+}

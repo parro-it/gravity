@@ -10,6 +10,7 @@
 #define __GRAVITY_CORE__
 
 #include "gravity_vm.h"
+#include "../optional/gruv/gruv.h"
 
 #ifdef __cplusplus
 extern "C" {
