@@ -1,6 +1,6 @@
 #include "gruv.h"
 
-static uv_loop_t *gruv_loop;
+uv_loop_t *gruv_loop;
 
 void gruv_register(gravity_vm *vm) {
     gravity_vm_setvalue(vm, GRUV_CLASS, VALUE_FROM_OBJECT(gruv_class));
@@ -13,22 +13,27 @@ void gruv_init() {
     gravity_class_bind(gruv_meta, "version", NEW_CLOSURE_VALUE(gruv_version));
     gravity_class_bind(gruv_meta, "startLoop", NEW_CLOSURE_VALUE(gruv_startLoop));
     gravity_class_bind(gruv_meta, "mkdir", NEW_CLOSURE_VALUE(gruv_mkdir));
+    gravity_class_bind(gruv_meta, "rmdir", NEW_CLOSURE_VALUE(gruv_rmdir));
+    gravity_class_bind(gruv_meta, "stat", NEW_CLOSURE_VALUE(gruv_stat));
 
     SETMETA_INITED(gruv_class);
 
-    gruv_loop = malloc(sizeof(uv_loop_t));
-
-    uv_loop_init(gruv_loop);
+    gruv_loop = uv_default_loop();
 
 }
+
+
 
 bool gruv_startLoop (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t rindex) {
     #pragma unused (vm, nargs)
 
     uv_run(gruv_loop, UV_RUN_DEFAULT);
 
+/*
     uv_loop_close(gruv_loop);
     free(gruv_loop);
+    gruv_loop = NULL;
+*/
 
     RETURN_NOVALUE();
 }

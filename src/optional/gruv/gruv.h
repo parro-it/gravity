@@ -52,7 +52,9 @@ void gruv_register(gravity_vm *vm);
 
 static bool gruv_version (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t rindex);
 bool gruv_mkdir (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t rindex);
+bool gruv_rmdir (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t rindex);
 bool gruv_startLoop (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t rindex);
+bool gruv_stat (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t rindex);
 
 typedef struct gruv_fs_t {
     uv_fs_t inherit;
