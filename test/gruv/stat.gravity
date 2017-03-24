@@ -9,7 +9,7 @@ func main() {
     var results;
     Gruv.mkdir('/tmp/aTest', func() {
         Gruv.stat('/tmp/aTest', func(err, result) {
-            results = result;
+            results = result['size'];
         });
     });
 

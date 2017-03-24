@@ -42,8 +42,10 @@
 #include <uv.h>
 
 #define GRUV_CLASS                      "Gruv"
+#define GRUV_STAT_CLASS                      "GruvStat"
 
 static gravity_class_t *gruv_class;
+static gravity_class_t *gruv_stat_class;
 
 extern uv_loop_t *gruv_loop;
 
@@ -62,5 +64,16 @@ typedef struct gruv_fs_t {
     gravity_vm *vm;
 } gruv_fs_t;
 
+#define STAT_INSERT_INT(name) gravity_hash_insert( \
+    map->hash, \
+    VALUE_FROM_STRING(gruvReq->vm, #name, strlen(#name)), \
+    VALUE_FROM_INT(req->statbuf.st_ ## name) \
+)
+
+#define STAT_INSERT_TIME(name) gravity_hash_insert( \
+    map->hash, \
+    VALUE_FROM_STRING(gruvReq->vm, #name, strlen(#name)), \
+    VALUE_FROM_INT(req->statbuf.st_ ## name.tv_sec) \
+)
 
 #endif

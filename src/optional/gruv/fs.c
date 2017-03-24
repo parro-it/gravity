@@ -1,5 +1,5 @@
 #include "gruv.h"
-
+#include "gravity_hash.h"
 /*
 
 struct uv_fs_s {
@@ -80,7 +80,27 @@ void stat_cb(uv_fs_t *req) {
         args[1] = VALUE_FROM_NULL;
     } else {
         args[0] = VALUE_FROM_NULL;
-        args[1] = VALUE_FROM_INT(req->statbuf.st_size);
+        gravity_map_t *map = gravity_map_new(gruvReq->vm, 10);
+
+        STAT_INSERT_INT(dev);
+        STAT_INSERT_INT(mode);
+        STAT_INSERT_INT(nlink);
+        STAT_INSERT_INT(uid);
+        STAT_INSERT_INT(gid);
+        STAT_INSERT_INT(rdev);
+        STAT_INSERT_INT(ino);
+        STAT_INSERT_INT(size);
+        STAT_INSERT_INT(blksize);
+        STAT_INSERT_INT(blocks);
+        STAT_INSERT_INT(flags);
+        STAT_INSERT_INT(gen);
+
+        STAT_INSERT_TIME(atim);
+        STAT_INSERT_TIME(mtim);
+        STAT_INSERT_TIME(ctim);
+        STAT_INSERT_TIME(birthtim);
+
+        args[1] = VALUE_FROM_OBJECT(map);
     }
 
     gravity_vm_runclosure(
@@ -96,7 +116,6 @@ void stat_cb(uv_fs_t *req) {
 
 
 bool gruv_mkdir (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t rindex) {
-
     gruv_fs_t *req = malloc(sizeof(gruv_fs_t));
 
     req->vm = vm;

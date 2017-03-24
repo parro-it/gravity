@@ -8,8 +8,8 @@ void gruv_register(gravity_vm *vm) {
 
 void gruv_init() {
     gruv_class = gravity_class_new_pair(NULL, GRUV_CLASS, NULL, 0, 0);
-    gravity_class_t *gruv_meta = gravity_class_get_meta(gruv_class);
 
+    gravity_class_t *gruv_meta = gravity_class_get_meta(gruv_class);
     gravity_class_bind(gruv_meta, "version", NEW_CLOSURE_VALUE(gruv_version));
     gravity_class_bind(gruv_meta, "startLoop", NEW_CLOSURE_VALUE(gruv_startLoop));
     gravity_class_bind(gruv_meta, "mkdir", NEW_CLOSURE_VALUE(gruv_mkdir));
