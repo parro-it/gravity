@@ -1,0 +1,18 @@
+#unittest {
+    name: "test stat";
+    error: NONE;
+    result: 68;
+};
+
+
+func main() {
+    var results;
+    Gruv.mkdir('/tmp/aTest', func() {
+        Gruv.stat('/tmp/aTest', func(err, result) {
+            results = result;
+        });
+    });
+
+    Gruv.startLoop();
+    return results;
+}
