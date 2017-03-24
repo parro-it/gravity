@@ -1,0 +1,15 @@
+#unittest {
+    name: "test mkdir";
+    error: NONE;
+    result: "file already exists|false";
+};
+
+
+func main() {
+    var results;
+    Gruv.mkdir('/tmp/aTest', func(err, result) {
+        results = err + '|' + result;
+    });
+    Gruv.startLoop();
+    return results;
+}

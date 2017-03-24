@@ -45,8 +45,20 @@
 
 static gravity_class_t *gruv_class;
 
+extern uv_loop_t *gruv_loop;
+
 void gruv_init();
 void gruv_register(gravity_vm *vm);
+
 static bool gruv_version (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t rindex);
+bool gruv_mkdir (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t rindex);
+bool gruv_startLoop (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t rindex);
+
+typedef struct gruv_fs_t {
+    uv_fs_t inherit;
+    void *data;
+    gravity_vm *vm;
+} gruv_fs_t;
+
 
 #endif

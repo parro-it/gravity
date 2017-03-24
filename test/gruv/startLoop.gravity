@@ -1,0 +1,11 @@
+#unittest {
+    name: "test startLoop";
+    error: NONE;
+    result: "";
+};
+
+
+func main() {
+    Gruv.startLoop();
+    return "";
+}
