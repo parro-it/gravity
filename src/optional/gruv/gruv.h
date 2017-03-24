@@ -58,21 +58,20 @@ bool gruv_rmdir (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t
 bool gruv_startLoop (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t rindex);
 bool gruv_stat (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t rindex);
 
-typedef struct gruv_fs_t {
-    uv_fs_t inherit;
-    void *data;
+typedef struct {
+    gravity_closure_t *closure;
     gravity_vm *vm;
-} gruv_fs_t;
+} gruv_fs_data;
 
 #define STAT_INSERT_INT(name) gravity_hash_insert( \
     map->hash, \
-    VALUE_FROM_STRING(gruvReq->vm, #name, strlen(#name)), \
+    VALUE_FROM_STRING(vm, #name, strlen(#name)), \
     VALUE_FROM_INT(req->statbuf.st_ ## name) \
 )
 
 #define STAT_INSERT_TIME(name) gravity_hash_insert( \
     map->hash, \
-    VALUE_FROM_STRING(gruvReq->vm, #name, strlen(#name)), \
+    VALUE_FROM_STRING(vm, #name, strlen(#name)), \
     VALUE_FROM_INT(req->statbuf.st_ ## name.tv_sec) \
 )
 

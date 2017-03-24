@@ -1,0 +1,9 @@
+class Assert {
+    static func equals(expected, actual) {
+        if (expected == actual) {
+            return;
+        }
+
+        Fiber.abort('expected ' + expected + ', but actual value is ' + actual)
+    }
+}

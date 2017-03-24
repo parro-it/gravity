@@ -1,18 +1,11 @@
-#unittest {
-    name: "test stat";
-    error: NONE;
-    result: 4096;
-};
-
+#include 'src/optional/assertion/assertion.gravity'
 
 func main() {
-    var results;
     Gruv.mkdir('/tmp/aTest', func() {
         Gruv.stat('/tmp/aTest', func(err, result) {
-            results = result['size'];
+            Assert.equals(4096, result['size']);
         });
     });
 
     Gruv.startLoop();
-    return results;
 }

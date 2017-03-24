@@ -1,43 +1,9 @@
 #include "gruv.h"
 #include "gravity_hash.h"
-/*
-
-struct uv_fs_s {
-  UV_REQ_FIELDS
-  uv_fs_type fs_type;
-  uv_loop_t* loop;
-  uv_fs_cb cb;
-  ssize_t result;
-  void* ptr;
-  const char* path;
-  uv_stat_t statbuf;  / Stores the result of uv_fs_stat() and uv_fs_fstat(). *
-  UV_FS_PRIVATE_FIELDS
-};
-
-typedef struct {
-  uint64_t st_dev;
-  uint64_t st_mode;
-  uint64_t st_nlink;
-  uint64_t st_uid;
-  uint64_t st_gid;
-  uint64_t st_rdev;
-  uint64_t st_ino;
-  uint64_t st_size;
-  uint64_t st_blksize;
-  uint64_t st_blocks;
-  uint64_t st_flags;
-  uint64_t st_gen;
-  uv_timespec_t st_atim;
-  uv_timespec_t st_mtim;
-  uv_timespec_t st_ctim;
-  uv_timespec_t st_birthtim;
-} uv_stat_t;
-
-*/
 
 void mkdir_cb(uv_fs_t *req) {
-    gruv_fs_t *gruvReq = (gruv_fs_t *) req;
-    gravity_closure_t *callback = (gravity_closure_t *) gruvReq->data;
+    gruv_fs_data *gruvReq = (gruv_fs_data *) req->data;
+    gravity_closure_t *callback = gruvReq->closure;
 
     char * err = NULL;
     bool results = true;
@@ -68,44 +34,51 @@ void mkdir_cb(uv_fs_t *req) {
     uv_fs_req_cleanup(req);
 }
 
+gravity_map_t * statStructToMap(uv_fs_t *req) {
+    gruv_fs_data *data = (gruv_fs_data *) req->data;
+    gravity_vm *vm = data->vm;
+    gravity_map_t *map = gravity_map_new(vm, 10);
+
+    STAT_INSERT_INT(dev);
+    STAT_INSERT_INT(mode);
+    STAT_INSERT_INT(nlink);
+    STAT_INSERT_INT(uid);
+    STAT_INSERT_INT(gid);
+    STAT_INSERT_INT(rdev);
+    STAT_INSERT_INT(ino);
+    STAT_INSERT_INT(size);
+    STAT_INSERT_INT(blksize);
+    STAT_INSERT_INT(blocks);
+    STAT_INSERT_INT(flags);
+    STAT_INSERT_INT(gen);
+
+    STAT_INSERT_TIME(atim);
+    STAT_INSERT_TIME(mtim);
+    STAT_INSERT_TIME(ctim);
+    STAT_INSERT_TIME(birthtim);
+
+    return map;
+}
+
 void stat_cb(uv_fs_t *req) {
-    gruv_fs_t *gruvReq = (gruv_fs_t *) req;
-    gravity_closure_t *callback = (gravity_closure_t *) gruvReq->data;
+    gruv_fs_data *data = (gruv_fs_data *) req->data;
+    gravity_closure_t *closure = data->closure;
+    gravity_vm *vm = data->vm;
 
     gravity_value_t args[2];
 
     if (req->result < 0) {
         const char * err = uv_strerror(req->result);
-        args[0] = VALUE_FROM_STRING(gruvReq->vm, err, strlen(err));
+        args[0] = VALUE_FROM_STRING(vm, err, strlen(err));
         args[1] = VALUE_FROM_NULL;
     } else {
         args[0] = VALUE_FROM_NULL;
-        gravity_map_t *map = gravity_map_new(gruvReq->vm, 10);
-
-        STAT_INSERT_INT(dev);
-        STAT_INSERT_INT(mode);
-        STAT_INSERT_INT(nlink);
-        STAT_INSERT_INT(uid);
-        STAT_INSERT_INT(gid);
-        STAT_INSERT_INT(rdev);
-        STAT_INSERT_INT(ino);
-        STAT_INSERT_INT(size);
-        STAT_INSERT_INT(blksize);
-        STAT_INSERT_INT(blocks);
-        STAT_INSERT_INT(flags);
-        STAT_INSERT_INT(gen);
-
-        STAT_INSERT_TIME(atim);
-        STAT_INSERT_TIME(mtim);
-        STAT_INSERT_TIME(ctim);
-        STAT_INSERT_TIME(birthtim);
-
-        args[1] = VALUE_FROM_OBJECT(map);
+        args[1] = VALUE_FROM_OBJECT(statStructToMap(req));
     }
 
     gravity_vm_runclosure(
-        gruvReq->vm,
-        callback,
+        vm,
+        closure,
         VALUE_FROM_NULL,
         args,
         2
@@ -116,36 +89,47 @@ void stat_cb(uv_fs_t *req) {
 
 
 bool gruv_mkdir (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t rindex) {
-    gruv_fs_t *req = malloc(sizeof(gruv_fs_t));
+    uv_fs_t *req = malloc(sizeof(uv_fs_t));
 
-    req->vm = vm;
-    req->data = VALUE_AS_CLOSURE(GET_VALUE(2));
+    gruv_fs_data * data = malloc(sizeof(gruv_fs_data));
+    req->data = data;
+    data->vm = vm;
+    data->closure = VALUE_AS_CLOSURE(GET_VALUE(2));
+
     gravity_value_t pathValue = GET_VALUE(1);
     gravity_string_t *path = VALUE_AS_STRING(pathValue);
-    uv_fs_mkdir(gruv_loop, (uv_fs_t*) req, path->s, S_IRUSR | S_IWUSR, mkdir_cb);
+    uv_fs_mkdir(gruv_loop, req, path->s, S_IRUSR | S_IWUSR, mkdir_cb);
     RETURN_NOVALUE();
 }
 
 bool gruv_rmdir (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t rindex) {
-    gruv_fs_t *req = malloc(sizeof(gruv_fs_t));
+    uv_fs_t *req = malloc(sizeof(uv_fs_t));
+  
+    gruv_fs_data * data = malloc(sizeof(gruv_fs_data));
+    req->data = data;
+    data->vm = vm;
+    data->closure = VALUE_AS_CLOSURE(GET_VALUE(2));
 
     gravity_string_t *path = VALUE_AS_STRING(GET_VALUE(1));
-    req->data = VALUE_AS_CLOSURE(GET_VALUE(2));
-    req->vm = vm;
+    
 
-    uv_fs_rmdir(gruv_loop, (uv_fs_t*) req, path->s, mkdir_cb);
+    uv_fs_rmdir(gruv_loop, req, path->s, mkdir_cb);
 
     RETURN_NOVALUE();
 }
 
 
 bool gruv_stat (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t rindex) {
-    gruv_fs_t *req = malloc(sizeof(gruv_fs_t));
+    uv_fs_t *req = malloc(sizeof(uv_fs_t));
+
+    gruv_fs_data * data = malloc(sizeof(gruv_fs_data));
+    req->data = data;
+    data->vm = vm;
+    data->closure = VALUE_AS_CLOSURE(GET_VALUE(2));
 
     gravity_string_t *path = VALUE_AS_STRING(GET_VALUE(1));
-    req->data = VALUE_AS_CLOSURE(GET_VALUE(2));
-    req->vm = vm;
-    uv_fs_stat(gruv_loop, (uv_fs_t*) req, path->s, stat_cb);
+    
+    uv_fs_stat(gruv_loop, req, path->s, stat_cb);
     RETURN_NOVALUE();
 }
 
