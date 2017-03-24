@@ -1,7 +1,7 @@
 #unittest {
     name: "test stat";
     error: NONE;
-    result: 68;
+    result: 4096;
 };
 
 
