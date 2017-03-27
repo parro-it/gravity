@@ -92,8 +92,8 @@ bool gruv_mkdir (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t
     uv_fs_t *req = mk_req(vm, args, nargs);
 
     gravity_string_t *path = VALUE_AS_STRING(GET_VALUE(1));
-
-    uv_fs_mkdir(gruv_loop, req, path->s, S_IRUSR | S_IWUSR, empty_result_cb);
+    gravity_int_t mode = VALUE_AS_INT(GET_VALUE(2));
+    uv_fs_mkdir(gruv_loop, req, path->s, mode, empty_result_cb);
     
     RETURN_NOVALUE();
 }

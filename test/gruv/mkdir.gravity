@@ -3,13 +3,21 @@
 #unittest {};
 
 test('Create a directory', func () {
+    var checked = false;
+
     Gruv.rmdir('/tmp/aTest', func() {
-        Gruv.mkdir('/tmp/aTest', func(err, result2) {
+        Gruv.mkdir('/tmp/aTest', 511,func(err) {
             Assert.equals(null, err);
+            Gruv.stat('/tmp/aTest', func(err, result) {
+                Assert.equals(4096, result['size']);
+                checked = true;
+            });
         });
     });
 
     Gruv.startLoop();
+
+    Assert.equals(true, checked);
 });
 
 func main() {}
