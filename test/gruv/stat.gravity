@@ -1,6 +1,7 @@
 #include 'src/optional/assertion/assertion.gravity'
+#unittest {};
 
-func main() {
+test('Returned stat instance contains file size', func () {
     Gruv.mkdir('/tmp/aTest', func() {
         Gruv.stat('/tmp/aTest', func(err, result) {
             Assert.equals(4096, result['size']);
@@ -8,4 +9,6 @@ func main() {
     });
 
     Gruv.startLoop();
-}
+});
+
+func main() {}

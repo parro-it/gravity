@@ -1,18 +1,15 @@
-#unittest {
-    name: "test mkdir";
-    error: NONE;
-    result: null;
-};
+#include 'src/optional/assertion/assertion.gravity'
 
+#unittest {};
 
-func main() {
-    var results;
+test('Create a directory', func () {
     Gruv.rmdir('/tmp/aTest', func() {
         Gruv.mkdir('/tmp/aTest', func(err, result2) {
-            results = err;
+            Assert.equals(null, err);
         });
     });
 
     Gruv.startLoop();
-    return results;
-}
+});
+
+func main() {}

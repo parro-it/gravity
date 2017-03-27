@@ -1,11 +1,8 @@
-#unittest {
-    name: "test startLoop";
-    error: NONE;
-    result: "";
-};
+#include 'src/optional/assertion/assertion.gravity'
+#unittest {};
 
-
-func main() {
+test('Loop exit immediatly if there are no callbacks registered', func () {
     Gruv.startLoop();
-    return "";
-}
+});
+
+func main() {}

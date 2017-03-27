@@ -1,10 +1,10 @@
-#unittest {
-	name: "test gruv";
-	error: NONE;
-	result: "1.11.1-dev";
-};
+#include 'src/optional/assertion/assertion.gravity'
 
+#unittest {};
 
-func main() {
-	return Gruv.version();
-}
+test('return libuv version', func () {
+    Assert.equals("1.11.1-dev", Gruv.version());
+    Gruv.startLoop();
+});
+
+func main() {}

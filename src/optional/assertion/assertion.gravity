@@ -7,3 +7,8 @@ class Assert {
         Fiber.abort('expected ' + expected + ', but actual value is ' + actual)
     }
 }
+
+func test(name, fn) {
+    fn();
+}
+
