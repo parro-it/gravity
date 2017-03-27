@@ -15,6 +15,7 @@ void gruv_init() {
     gravity_class_bind(gruv_meta, "mkdir", NEW_CLOSURE_VALUE(gruv_mkdir));
     gravity_class_bind(gruv_meta, "rmdir", NEW_CLOSURE_VALUE(gruv_rmdir));
     gravity_class_bind(gruv_meta, "stat", NEW_CLOSURE_VALUE(gruv_stat));
+    gravity_class_bind(gruv_meta, "open", NEW_CLOSURE_VALUE(gruv_open));
 
     SETMETA_INITED(gruv_class);
 

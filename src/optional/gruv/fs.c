@@ -1,6 +1,34 @@
 #include "gruv.h"
 #include "gravity_hash.h"
 
+void result_cb(uv_fs_t *req) {
+    gruv_fs_data *data = (gruv_fs_data *) req->data;
+
+    gravity_value_t err;
+
+    if (req->result < 0) {
+        const char * message = uv_strerror(req->result);
+        err = VALUE_FROM_STRING(data->vm, message, strlen(message));
+    } else {
+        err  = VALUE_FROM_NULL;
+    }
+
+    gravity_value_t args[] = {err, VALUE_FROM_NULL};
+    if (req->result >= 0) {
+        args[1] = VALUE_FROM_INT(req->result);
+    }
+
+    gravity_vm_runclosure(
+        data->vm,
+        data->closure,
+        VALUE_FROM_NULL,
+        args,
+        2
+    );
+
+    uv_fs_req_cleanup(req);
+}
+
 void empty_result_cb(uv_fs_t *req) {
     gruv_fs_data *data = (gruv_fs_data *) req->data;
 
@@ -108,7 +136,6 @@ bool gruv_rmdir (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t
     RETURN_NOVALUE();
 }
 
-
 bool gruv_stat (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t rindex) {
     uv_fs_t *req = mk_req(vm, args, nargs);
 
@@ -116,6 +143,18 @@ bool gruv_stat (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t 
     
     uv_fs_stat(gruv_loop, req, path->s, stat_cb);
     
+    RETURN_NOVALUE();
+}
+
+bool gruv_open (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t rindex) {
+    uv_fs_t *req = mk_req(vm, args, nargs);
+
+    gravity_string_t *path = VALUE_AS_STRING(GET_VALUE(1));
+    gravity_int_t flags = VALUE_AS_INT(GET_VALUE(2));
+    gravity_int_t mode = VALUE_AS_INT(GET_VALUE(3));
+    
+    uv_fs_open(gruv_loop, req, path->s, flags, mode, result_cb);
+        
     RETURN_NOVALUE();
 }
 

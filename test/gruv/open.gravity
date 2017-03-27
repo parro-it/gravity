@@ -1,0 +1,21 @@
+#include 'src/optional/assertion/assertion.gravity'
+
+#unittest {};
+
+test('Create a directory', func () {
+    var checked = false;
+
+    Gruv.open('/tmp/file', 65, 511,func(err, fd) {
+        Assert.equals(null, err);
+        Assert.equals(true, fd is Int);
+        Assert.equals(true, fd > 0);
+        // System.print(fd);
+        checked = true;
+    });
+
+    Gruv.startLoop();
+
+    Assert.equals(true, checked);
+});
+
+func main() {}
