@@ -1,9 +1,9 @@
 #include "gruv.h"
 #include "gravity_hash.h"
 
-void mkdir_cb(uv_fs_t *req) {
-    gruv_fs_data *gruvReq = (gruv_fs_data *) req->data;
-    gravity_closure_t *callback = gruvReq->closure;
+void empty_result_cb(uv_fs_t *req) {
+    gruv_fs_data *data = (gruv_fs_data *) req->data;
+    gravity_closure_t *callback = data->closure;
 
     char * err = NULL;
     bool results = true;
@@ -18,13 +18,13 @@ void mkdir_cb(uv_fs_t *req) {
     if (err == NULL) {
         args[0] = VALUE_FROM_NULL;
     } else {
-        args[0] = VALUE_FROM_STRING(gruvReq->vm, err, strlen(err));
+        args[0] = VALUE_FROM_STRING(data->vm, err, strlen(err));
     }
 
     args[1] = VALUE_FROM_BOOL(results);
 
     gravity_vm_runclosure(
-        gruvReq->vm,
+        data->vm,
         callback,
         VALUE_FROM_BOOL(results),
         args,
@@ -98,7 +98,7 @@ bool gruv_mkdir (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t
 
     gravity_value_t pathValue = GET_VALUE(1);
     gravity_string_t *path = VALUE_AS_STRING(pathValue);
-    uv_fs_mkdir(gruv_loop, req, path->s, S_IRUSR | S_IWUSR, mkdir_cb);
+    uv_fs_mkdir(gruv_loop, req, path->s, S_IRUSR | S_IWUSR, empty_result_cb);
     RETURN_NOVALUE();
 }
 
@@ -113,7 +113,7 @@ bool gruv_rmdir (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t
     gravity_string_t *path = VALUE_AS_STRING(GET_VALUE(1));
     
 
-    uv_fs_rmdir(gruv_loop, req, path->s, mkdir_cb);
+    uv_fs_rmdir(gruv_loop, req, path->s, empty_result_cb);
 
     RETURN_NOVALUE();
 }
